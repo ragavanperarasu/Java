@@ -24,7 +24,6 @@ public class TreeMapExample {
 
             switch (choice) {
                 case 1:
-                    // Add element (key-value pair) to TreeMap
                     System.out.print("Enter Key (Integer): ");
                     int key = scanner.nextInt();
                     System.out.print("Enter Value (String): ");
