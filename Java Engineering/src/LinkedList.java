@@ -7,16 +7,17 @@ public class LinkedList {
         java.util.LinkedList<Integer> list = new java.util.LinkedList<>();
         Scanner scanner = new Scanner(System.in);
         int choice, element, index;
+        System.out.println("\n--- Linked List Operations ---");
+        System.out.println("1. Add element at specific index");
+        System.out.println("2. Delete element from specific index");
+        System.out.println("3. Display all elements");
+        System.out.println("4. Search for an element");
+        System.out.println("5. Exit");
 
         // Menu for LinkedList Operations
         do {
-            System.out.println("\n--- Linked List Operations ---");
-            System.out.println("1. Add element at specific index");
-            System.out.println("2. Delete element from specific index");
-            System.out.println("3. Display all elements");
-            System.out.println("4. Search for an element");
-            System.out.println("5. Exit");
-            System.out.print("Enter your choice: ");
+
+            System.out.print("\nEnter your choice: ");
             choice = scanner.nextInt();
 
             switch (choice) {

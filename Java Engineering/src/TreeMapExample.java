@@ -80,3 +80,38 @@ public class TreeMapExample {
         scanner.close();
     }
 }
+/*
+Algorithm:
+Start.
+Create a TreeMap object to store the key-value pairs.
+Present a menu with the following options:
+    Add an element (key-value pair).
+    Delete an element by key.
+    Display all elements.
+    Search for a specific key.
+    Exit the program.
+Depending on the user's choice:
+    Add: Prompt the user to enter a key and a value, then insert the pair into the TreeMap.
+    Delete: Prompt the user to enter a key, then remove the corresponding entry from the TreeMap.
+    Display: Print all key-value pairs in the TreeMap.
+    Search: Prompt the user to enter a key, and check if the key exists in the TreeMap.
+Exit: Terminate the program.
+Loop until the user chooses to exit.
+End.
+
+Explanation:
+TreeMap:
+
+TreeMap<Integer, String> is used to store key-value pairs where the key is an integer, and the value is a string.
+The TreeMap automatically sorts elements based on the key.
+Switch-Case Structure:
+
+Add Element: Prompts the user for a key and a value, then adds the key-value pair to the TreeMap using put().
+Delete Element: Prompts the user for a key and removes the corresponding entry using remove().
+Display Elements: Iterates through the TreeMap using a for-each loop and prints all key-value pairs.
+Search for a Key: Prompts the user for a key and checks if it exists using containsKey(). If found, it displays the corresponding value.
+User Interaction:
+
+The user interacts with the program via the console, choosing actions from the menu.
+The loop continues until the user selects the exit option (choice == 5).
+*/
