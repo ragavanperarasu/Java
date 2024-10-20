@@ -8,16 +8,17 @@ public class HashSet {
         Set<Integer> set = new java.util.HashSet<>();
         Scanner scanner = new Scanner(System.in);
         int choice, element;
-
+        System.out.println("\n--- HashSet Operations ---");
+        System.out.println("1. Add element");
+        System.out.println("2. Remove element");
+        System.out.println("3. Display all elements");
+        System.out.println("4. Search for an element");
+        System.out.println("5. Exit");
         // Menu-driven approach for HashSet operations
         do {
-            System.out.println("\n--- HashSet Operations ---");
-            System.out.println("1. Add element");
-            System.out.println("2. Remove element");
-            System.out.println("3. Display all elements");
-            System.out.println("4. Search for an element");
-            System.out.println("5. Exit");
-            System.out.print("Enter your choice: ");
+
+
+            System.out.print("\nEnter your choice: ");
             choice = scanner.nextInt();
 
             switch (choice) {
