@@ -1,0 +1,130 @@
+TCPServer.java
+
+import java.net.*;
+import java.io.*;
+
+public class TCPServer {
+    public static void main(String[] args) throws Exception {
+        ServerSocket ss = new ServerSocket(1234);
+        Socket s = ss.accept();
+        BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+        System.out.println("Client: " + in.readLine());
+        out.println("Hello from server");
+        s.close();
+        ss.close();
+    }
+}
+
+
+TCPClient.java
+
+import java.net.*;
+import java.io.*;
+
+public class TCPClient {
+    public static void main(String[] args) throws Exception {
+        Socket s = new Socket("localhost", 1234);
+        PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        out.println("Hello from client");
+        System.out.println("Server: " + in.readLine());
+        s.close();
+    }
+}
+
+UDPServer.java
+
+import java.net.*;
+
+public class UDPServer {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket(1235);
+        byte[] buffer = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+        ds.receive(dp);
+        String msg = new String(dp.getData(), 0, dp.getLength());
+        System.out.println("Client: " + msg);
+
+        String reply = "Hello from server";
+        DatagramPacket dpReply = new DatagramPacket(reply.getBytes(), reply.length(), dp.getAddress(), dp.getPort());
+        ds.send(dpReply);
+        ds.close();
+    }
+}
+
+
+UDPClient.java
+
+
+import java.net.*;
+
+public class UDPClient {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket();
+        String msg = "Hello from client";
+        InetAddress ip = InetAddress.getByName("localhost");
+
+        DatagramPacket dp = new DatagramPacket(msg.getBytes(), msg.length(), ip, 1235);
+        ds.send(dp);
+
+        byte[] buffer = new byte[1024];
+        DatagramPacket dpReply = new DatagramPacket(buffer, buffer.length);
+        ds.receive(dpReply);
+        System.out.println("Server: " + new String(dpReply.getData(), 0, dpReply.getLength()));
+        ds.close();
+    }
+}
+
+
+MultiTCPServer.java
+
+import java.net.*;
+import java.io.*;
+
+public class MultiTCPServer {
+    public static void main(String[] args) throws Exception {
+        ServerSocket ss = new ServerSocket(1236);
+        while (true) {
+            Socket s = ss.accept();
+            new Thread(() -> {
+                try {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                    PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+                    System.out.println("Client: " + in.readLine());
+                    out.println("Hello from multi-server");
+                    s.close();
+                } catch (Exception e) {}
+            }).start();
+        }
+    }
+}
+
+
+
+=========================
+
+import java.net.*;
+import java.io.*;
+
+public class MultiTCPServer {
+    public static void main(String[] args) throws Exception {
+        ServerSocket ss = new ServerSocket(1234);
+        System.out.println("Server started...");
+        while (true) {
+            Socket s = ss.accept(); // accept multiple clients
+            new Thread(() -> {
+                try {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                    PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+                    System.out.println("Client: " + in.readLine());
+                    out.println("Hello from server");
+                    s.close(); // close only that client connection
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }).start(); // each client handled in a new thread
+        }
+    }
+}
+
