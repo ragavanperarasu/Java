@@ -1,0 +1,81 @@
+ffmpeg -stream_loop -1 -re -i sample.mp4 -c copy -f mpegts udp://127.0.0.1:1234
+
+================================
+# Create a simulator object
+set ns [new Simulator]
+
+# Create two nodes
+set n0 [$ns node]
+set n1 [$ns node]
+
+# Create a duplex link between n0 and n1 with 1Mb bandwidth and 10ms delay
+$ns duplex-link $n0 $n1 1Mb 10ms DropTail
+
+# Run the simulation
+$ns run
+==================================
+
+sudo apt update
+sudo apt install iperf3 -y
+
+sudo yum install iperf3 -y
+iperf3 -s
+iperf3 -c <server-ip>
+
+
+📊 5. Useful Options
+Option	Description
+-t 30	Run the test for 30 seconds
+-p <port>	Specify port
+-R	Reverse mode (server → client)
+-u	Use UDP instead of TCP
+-b 100M	Bandwidth limit for UDP test
+-P 4	Run 4 parallel connections
+--logfile result.txt	Save output to file
+
+
+=========================
+
+sudo tc qdisc add dev <interface> root netem <options>
+sudo tc qdisc add dev eth0 root netem delay 100ms 20ms
+sudo tc qdisc add dev eth0 root netem loss 5%
+sudo tc qdisc add dev eth0 root tbf rate 1mbit burst 32kbit latency 400ms
+tc qdisc show dev eth0
+
+
+==========================
+
+sudo mn [options]
+You use flags (options) to define:
+
+Number of hosts, switches
+
+Controller type
+
+Link parameters (bandwidth, delay, loss)
+
+Topology type
+
+💡 Common Mininet Flags
+Flag	Meaning	Example
+--topo	Set topology	--topo single,3 (1 switch, 3 hosts)
+--controller	Choose controller type	--controller=remote
+--switch	Switch type	--switch ovsk
+--link	Set link characteristics	--link tc
+--test	Run built-in tests	--test pingall
+--custom	Use your own Python topology file	--custom mytopo.py
+--mac	Auto-assign MAC addresses	--mac
+--ipbase	Base IP for hosts	--ipbase=10.0.0.0/8
+--nat	Add NAT to connect virtual network to Internet	--nat
+--xterms	Open xterm windows for all hosts	--xterms
+
+
+sudo mn --topo single,3
+sudo mn --topo linear,4
+sudo mn --topo tree,depth=2,fanout=3
+sudo mn --topo single,2 --link tc,bw=10,delay=50ms,loss=2
+sudo mn --test pingall
+
+
+
+
