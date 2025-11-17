@@ -1,0 +1,74 @@
+#include <stdio.h>
+
+int main() {
+    int num_pages, num_frames, page_size;
+
+    printf("Enter number of pages: ");
+    scanf("%d", &num_pages);
+
+    printf("Enter number of frames: ");
+    scanf("%d", &num_frames);
+
+    printf("Enter page size (bytes): ");
+    scanf("%d", &page_size);
+
+    int page_table[num_pages];
+    for (int i = 0; i < num_pages; i++) page_table[i] = -1;
+
+    printf("\nEnter page table mapping (page -> frame).\n");
+    printf("Enter -1 if page is not present in memory.\n");
+    for (int i = 0; i < num_pages; i++) {
+        printf("Page %d -> Frame: ", i);
+        scanf("%d", &page_table[i]);
+    }
+
+    // Print Page Table
+    printf("\n================= PAGE TABLE =================\n");
+    printf("+-----------+-----------+\n");
+    printf("|   Page#   |   Frame#  |\n");
+    printf("+-----------+-----------+\n");
+    for (int i = 0; i < num_pages; i++) {
+        if (page_table[i] != -1)
+            printf("|%7d   |%7d   |\n", i, page_table[i]);
+        else
+            printf("|%7d   |   N/A   |\n", i);
+    }
+    printf("+-----------+-----------+\n");
+
+    // Logical address translation loop
+    printf("\nEnter logical addresses (-1 to quit)\n");
+
+    while (1) {
+        int logical_address;
+        printf("\nLogical address> ");
+        scanf("%d", &logical_address);
+
+        if (logical_address == -1) {
+            printf("\nTerminating program. Bye!\n");
+            break;
+        }
+
+        int page_number = logical_address / page_size;
+        int offset = logical_address % page_size;
+
+        printf("\n=============================================\n");
+        printf("| Logical Address : %-10d                 |\n", logical_address);
+        printf("| Page Number     : %-10d                 |\n", page_number);
+        printf("| Offset          : %-10d                 |\n", offset);
+
+        if (page_number >= num_pages) {
+            printf("| Status          : INVALID PAGE            |\n");
+        } else if (page_table[page_number] == -1) {
+            printf("| Status          : PAGE FAULT              |\n");
+        } else {
+            int frame = page_table[page_number];
+            int physical_address = frame * page_size + offset;
+            printf("| Frame Number    : %-10d                 |\n", frame);
+            printf("| Physical Addr   : %-10d                 |\n", physical_address);
+            printf("| Status          : SUCCESS                 |\n");
+        }
+        printf("=============================================\n");
+    }
+
+    return 0;
+}

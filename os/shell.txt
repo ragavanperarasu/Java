@@ -1,0 +1,212 @@
+#!/bin/bash
+# ---------------------------------------------------
+# Menu Driven Shell Script to Simulate UNIX Commands
+# WITHOUT USING BUILT-IN COMMANDS
+# ---------------------------------------------------
+
+while true
+do
+    echo "--------------------------------------------------"
+    echo "        UNIX COMMAND IMPLEMENTATION MENU           "
+    echo "--------------------------------------------------"
+    echo "1. List files (ls)"
+    echo "2. Display file content (cat)"
+    echo "3. Copy file (cp)"
+    echo "4. Move/Rename file (mv)"
+    echo "5. Delete file (rm)"
+    echo "6. Search word in file (grep)"
+    echo "7. Count lines, words, characters (wc)"
+    echo "8. Display first N lines (head)"
+    echo "9. Display last N lines (tail)"
+    echo "10. Exit"
+    echo "--------------------------------------------------"
+    echo -n "Enter your choice [1-10]: "
+    read choice
+
+    case $choice in
+
+        # ---------- LS IMPLEMENTATION ----------
+        1)
+            echo "Files in current directory:"
+            for file in *; do
+                if [ -d "$file" ]; then
+                    echo "[DIR]  $file"
+                else
+                    echo "       $file"
+                fi
+            done
+            ;;
+
+        # ---------- CAT IMPLEMENTATION ----------
+        2)
+            echo -n "Enter filename to display: "
+            read filename
+            if [ -f "$filename" ]; then
+                while IFS= read -r line
+                do
+                    echo "$line"
+                done < "$filename"
+            else
+                echo "File not found!"
+            fi
+            ;;
+
+        # ---------- CP IMPLEMENTATION ----------
+        3)
+            echo -n "Enter source filename: "
+            read src
+            echo -n "Enter destination filename: "
+            read dest
+            if [ -f "$src" ]; then
+                exec 3<"$src"
+                exec 4>"$dest"
+                while IFS= read -r line <&3
+                do
+                    echo "$line" >&4
+                done
+                exec 3<&-
+                exec 4>&-
+                echo "File copied successfully."
+            else
+                echo "Source file not found!"
+            fi
+            ;;
+
+        # ---------- MV IMPLEMENTATION ----------
+        4)
+            echo -n "Enter source filename: "
+            read src
+            echo -n "Enter new filename: "
+            read dest
+            if [ -f "$src" ]; then
+                exec 3<"$src"
+                exec 4>"$dest"
+                while IFS= read -r line <&3
+                do
+                    echo "$line" >&4
+                done
+                exec 3<&-
+                exec 4>&-
+                > "$src"  # simulate deletion
+                echo "File renamed/moved successfully."
+            else
+                echo "Source file not found!"
+            fi
+            ;;
+
+        # ---------- RM IMPLEMENTATION ----------
+        5)
+            echo -n "Enter filename to delete (simulate): "
+            read filename
+            if [ -f "$filename" ]; then
+                > "$filename"  # truncates file content
+                echo "File content erased (simulated deletion)."
+            else
+                echo "File not found!"
+            fi
+            ;;
+
+        # ---------- GREP IMPLEMENTATION ----------
+        6)
+            echo -n "Enter word to search: "
+            read word
+            echo -n "Enter filename: "
+            read filename
+            if [ -f "$filename" ]; then
+                while IFS= read -r line
+                do
+                    case "$line" in
+                        "$word")
+                            echo "$line"
+                            ;;
+                    esac
+                done < "$filename"
+            else
+                echo "File not found!"
+            fi
+            ;;
+
+        # ---------- WC IMPLEMENTATION ----------
+        7)
+            echo -n "Enter filename: "
+            read filename
+            if [ -f "$filename" ]; then
+                lines=0
+                words=0
+                chars=0
+                while IFS= read -r line
+                do
+                    ((lines++))
+                    for word in $line; do
+                        ((words++))
+                    done
+                    ((chars+=${#line}))
+                done < "$filename"
+                echo "Lines: $lines"
+                echo "Words: $words"
+                echo "Characters: $chars"
+            else
+                echo "File not found!"
+            fi
+            ;;
+
+        # ---------- HEAD IMPLEMENTATION ----------
+        8)
+            echo -n "Enter filename: "
+            read filename
+            echo -n "Enter number of lines to display: "
+            read n
+            if [ -f "$filename" ]; then
+                count=0
+                while IFS= read -r line
+                do
+                    echo "$line"
+                    ((count++))
+                    if [ $count -ge $n ]; then
+                        break
+                    fi
+                done < "$filename"
+            else
+                echo "File not found!"
+            fi
+            ;;
+
+        # ---------- TAIL IMPLEMENTATION ----------
+        9)
+            echo -n "Enter filename: "
+            read filename
+            echo -n "Enter number of lines to display: "
+            read n
+            if [ -f "$filename" ]; then
+                total=0
+                while IFS= read -r _; do
+                    ((total++))
+                done < "$filename"
+
+                start=$((total - n + 1))
+                count=0
+                while IFS= read -r line
+                do
+                    ((count++))
+                    if [ $count -ge $start ]; then
+                        echo "$line"
+                    fi
+                done < "$filename"
+            else
+                echo "File not found!"
+            fi
+            ;;
+
+        # ---------- EXIT ----------
+        10)
+            echo "Exiting... Goodbye!"
+            exit 0
+            ;;
+
+        *)
+            echo "Invalid choice! Please enter a number between 1 and 10."
+            ;;
+    esac
+
+    echo ""
+done

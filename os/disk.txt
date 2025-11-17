@@ -1,0 +1,147 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void fcfs(int req[], int n, int head) {
+    int seek = 0;
+    printf("\nFCFS Disk Scheduling\n");
+    printf("Step\tHead\tRequest\tTotal Seek\n");
+
+    for (int i = 0; i < n; i++) {
+        int currSeek = abs(req[i] - head);
+        seek += currSeek;
+        printf("%d\t%d\t%d\t%d\n", i + 1, head, req[i], seek);
+        head = req[i];
+    }
+
+    printf("Total Seek Time: %d\n", seek);
+    printf("Average Seek Time: %.2f\n", (float)seek / n);
+}
+
+void cscan(int req[], int n, int head, int disk_size) {
+    int seek = 0;
+
+    // Sort the requests
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (req[j] > req[j + 1]) {
+                int temp = req[j];
+                req[j] = req[j + 1];
+                req[j + 1] = temp;
+            }
+
+    int index;
+    for (index = 0; index < n; index++)
+        if (head < req[index])
+            break;
+
+    printf("\nC-SCAN Disk Scheduling\n");
+    printf("Step\tHead\tRequest\tTotal Seek\n");
+
+    int step = 1;
+
+    // Move right
+    for (int i = index; i < n; i++) {
+        int currSeek = abs(req[i] - head);
+        seek += currSeek;
+        printf("%d\t%d\t%d\t%d\n", step++, head, req[i], seek);
+        head = req[i];
+    }
+
+    // Jump to beginning
+    if (index != 0) {
+        int jumpSeek = abs((disk_size - 1) - head);
+        seek += jumpSeek;
+        head = 0;
+        for (int i = 0; i < index; i++) {
+            int currSeek = abs(req[i] - head);
+            seek += currSeek;
+            printf("%d\t%d\t%d\t%d\n", step++, head, req[i], seek);
+            head = req[i];
+        }
+    }
+
+    printf("Total Seek Time: %d\n", seek);
+    printf("Average Seek Time: %.2f\n", (float)seek / n);
+}
+
+void look(int req[], int n, int head) {
+    int seek = 0;
+
+    // Sort the requests
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (req[j] > req[j + 1]) {
+                int temp = req[j];
+                req[j] = req[j + 1];
+                req[j + 1] = temp;
+            }
+
+    int index;
+    for (index = 0; index < n; index++)
+        if (head < req[index])
+            break;
+
+    printf("\nLOOK Disk Scheduling\n");
+    printf("Step\tHead\tRequest\tTotal Seek\n");
+
+    int step = 1;
+
+    // Move right first
+    for (int i = index; i < n; i++) {
+        int currSeek = abs(req[i] - head);
+        seek += currSeek;
+        printf("%d\t%d\t%d\t%d\n", step++, head, req[i], seek);
+        head = req[i];
+    }
+
+    // Move left
+    for (int i = index - 1; i >= 0; i--) {
+        int currSeek = abs(req[i] - head);
+        seek += currSeek;
+        printf("%d\t%d\t%d\t%d\n", step++, head, req[i], seek);
+        head = req[i];
+    }
+
+    printf("Total Seek Time: %d\n", seek);
+    printf("Average Seek Time: %.2f\n", (float)seek / n);
+}
+
+int main() {
+    int n, head, disk_size, choice;
+    printf("Enter number of requests: ");
+    scanf("%d", &n);
+    int req[n];
+    printf("Enter the request sequence: ");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &req[i]);
+
+    printf("Enter initial head position: ");
+    scanf("%d", &head);
+
+    do {
+        printf("\nDisk Scheduling Menu:\n");
+        printf("1. FCFS\n2. C-SCAN\n3. LOOK\n4. Exit\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                fcfs(req, n, head);
+                break;
+            case 2:
+                printf("Enter total disk size: ");
+                scanf("%d", &disk_size);
+                cscan(req, n, head, disk_size);
+                break;
+            case 3:
+                look(req, n, head);
+                break;
+            case 4:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice! Try again.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}

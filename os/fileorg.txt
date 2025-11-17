@@ -1,0 +1,148 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define SIZE 10   // Hash table size for direct file
+
+typedef struct {
+    int id;
+    char name[20];
+} Record;
+
+// ---------- HASH FUNCTION ----------
+int hash(int key) {
+    return key % SIZE;
+}
+
+// ---------- DIRECT FILE ORGANIZATION ----------
+void directFile() {
+    FILE *fp;
+    Record r;
+    int id, pos;
+    char name[20];
+
+    fp = fopen("direct_file.dat", "w+b");
+    if (!fp) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    // Initialize file with empty records
+    r.id = -1;
+    strcpy(r.name, "EMPTY");
+    for (int i = 0; i < SIZE; i++)
+        fwrite(&r, sizeof(Record), 1, fp);
+
+    // Insert records
+    printf("\n=== Direct File Organization ===\n");
+    printf("Enter records (ID Name), -1 to stop:\n");
+    while (1) {
+        printf("ID: ");
+        scanf("%d", &id);
+        if (id == -1) break;
+        printf("Name: ");
+        scanf("%s", name);
+
+        int loc = hash(id);
+        pos = loc * sizeof(Record);
+        fseek(fp, pos, SEEK_SET);
+        fread(&r, sizeof(Record), 1, fp);
+
+        if (r.id == -1) {
+            r.id = id;
+            strcpy(r.name, name);
+            fseek(fp, pos, SEEK_SET);
+            fwrite(&r, sizeof(Record), 1, fp);
+        } else {
+            printf("Collision at position %d! (Demo ignores collisions)\n", loc);
+        }
+    }
+
+    // Search record
+    printf("\nEnter ID to search: ");
+    scanf("%d", &id);
+    pos = hash(id) * sizeof(Record);
+    fseek(fp, pos, SEEK_SET);
+    fread(&r, sizeof(Record), 1, fp);
+    if (r.id == id)
+        printf("Record Found: ID=%d, Name=%s\n", r.id, r.name);
+    else
+        printf("Record not found!\n");
+
+    fclose(fp);
+}
+
+// ---------- HEAP FILE ORGANIZATION ----------
+void heapFile() {
+    FILE *fp;
+    Record r;
+    int id;
+    char name[20];
+
+    fp = fopen("heap_file.dat", "a+b");
+    if (!fp) {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    printf("\n=== Heap File Organization ===\n");
+    printf("Enter records (ID Name), -1 to stop:\n");
+    while (1) {
+        printf("ID: ");
+        scanf("%d", &id);
+        if (id == -1) break;
+        printf("Name: ");
+        scanf("%s", name);
+        r.id = id;
+        strcpy(r.name, name);
+        fwrite(&r, sizeof(Record), 1, fp);
+    }
+
+    // Search record
+    printf("\nEnter ID to search: ");
+    scanf("%d", &id);
+    rewind(fp);
+    int found = 0;
+    while (fread(&r, sizeof(Record), 1, fp)) {
+        if (r.id == id) {
+            printf("Record Found: ID=%d, Name=%s\n", r.id, r.name);
+            found = 1;
+            break;
+        }
+    }
+    if (!found)
+        printf("Record not found!\n");
+
+    fclose(fp);
+}
+
+// ---------- MAIN FUNCTION ----------
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\n==============================\n");
+        printf(" FILE SYSTEM ORGANIZATION MENU\n");
+        printf("==============================\n");
+        printf("1) Direct File Organization\n");
+        printf("2) Heap File Organization\n");
+        printf("3) Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                directFile();
+                break;
+            case 2:
+                heapFile();
+                break;
+            case 3:
+                printf("Exiting...\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Try again.\n");
+        }
+    }
+    return 0;
+}

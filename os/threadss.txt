@@ -1,0 +1,59 @@
+
+#include <stdio.h>
+#include <unistd.h>
+
+void task1() {
+    for (int i = 1; i <= 5; i++) {
+        printf("Task 1 - Count %d\n", i);
+        sleep(1);
+    }
+}
+
+int main() {
+    printf("Starting single-threaded program...\n");
+    task1();  
+    printf("Task finished.\n");
+    return 0;
+}
+
+
+
+
+
+
+
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+
+void* task(void* arg) {
+    int id = (int)arg;  
+
+    for (int i = 1; i <= 5; i++) {
+        printf("Thread %d: Count %d\n", id, i);
+        sleep(1);
+    }
+
+    return NULL;
+}
+
+int main() {
+    pthread_t threads[2];
+    int ids[2] = {1, 2};
+
+    printf("Starting threads...\n");
+
+  
+    for (int i = 0; i < 2; i++) {
+        pthread_create(&threads[i], NULL, task, &ids[i]);
+    }
+
+    
+    for (int i = 0; i < 2; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    printf("All threads completed.\n");
+
+    return 0;
+}

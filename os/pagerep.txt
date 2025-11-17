@@ -1,0 +1,185 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+int containsFIFO(int frames[], int fcount, int page) {
+    for (int i = 0; i < fcount; ++i)
+        if (frames[i] == page) return 1;
+    return 0;
+}
+
+int containsLRU(int frames[], int fcount, int page) {
+    for (int i = 0; i < fcount; ++i)
+        if (frames[i] == page) return i;
+    return -1;
+}
+
+int containsOPT(int frames[], int fcount, int page) {
+    for (int i = 0; i < fcount; ++i)
+        if (frames[i] == page) return 1;
+    return 0;
+}
+
+int findVictimOPT(int frames[], int fcount, int ref[], int n, int cur) {
+    int victim = -1, farthest = -1;
+    for (int i = 0; i < fcount; ++i) {
+        int page = frames[i];
+        if (page == -1) return i;
+        int j;
+        for (j = cur + 1; j < n; ++j)
+            if (ref[j] == page) break;
+        if (j == n) return i;
+        if (j > farthest) {
+            farthest = j;
+            victim = i;
+        }
+    }
+    return victim;
+}
+
+void printFrames(int frames[], int frameCount) {
+    for (int i = 0; i < frameCount; i++) {
+        if (frames[i] == -1)
+            printf(" - ");
+        else
+            printf(" %d ", frames[i]);
+    }
+}
+
+void runFIFO(int ref[], int n, int frames) {
+    int *f = malloc(sizeof(int) * frames);
+    for (int i = 0; i < frames; ++i) f[i] = -1;
+
+    int front = 0, faults = 0;
+
+    printf("\n--- FIFO Page Replacement ---\n");
+    printf("Ref\tFrames\t\t\tStatus\n");
+    printf("---------------------------------------------\n");
+
+    for (int i = 0; i < n; ++i) {
+        int p = ref[i];
+        printf("%2d\t", p);
+        if (!containsFIFO(f, frames, p)) {
+            f[front] = p;
+            front = (front + 1) % frames;
+            faults++;
+            printFrames(f, frames);
+            printf("\tF\n");
+        } else {
+            printFrames(f, frames);
+            printf("\t \n");
+        }
+    }
+    printf("---------------------------------------------\n");
+    printf("Total Page Faults (FIFO) = %d\n", faults);
+    free(f);
+}
+
+void runLRU(int ref[], int n, int frames) {
+    int *f = malloc(sizeof(int) * frames);
+    int *lastUsed = malloc(sizeof(int) * frames);
+    for (int i = 0; i < frames; ++i) { f[i] = -1; lastUsed[i] = -1; }
+
+    int faults = 0;
+    printf("\n--- LRU Page Replacement ---\n");
+    printf("Ref\tFrames\t\t\tStatus\n");
+    printf("---------------------------------------------\n");
+
+    for (int t = 0; t < n; ++t) {
+        int p = ref[t];
+        printf("%2d\t", p);
+        int idx = containsLRU(f, frames, p);
+        if (idx != -1) {
+            lastUsed[idx] = t;
+            printFrames(f, frames);
+            printf("\t \n");
+        } else {
+            int empty = -1;
+            for (int i = 0; i < frames; ++i)
+                if (f[i] == -1) { empty = i; break; }
+
+            if (empty != -1) {
+                f[empty] = p;
+                lastUsed[empty] = t;
+            } else {
+                int lru = 0;
+                for (int i = 1; i < frames; ++i)
+                    if (lastUsed[i] < lastUsed[lru]) lru = i;
+                f[lru] = p;
+                lastUsed[lru] = t;
+            }
+            faults++;
+            printFrames(f, frames);
+            printf("\tF\n");
+        }
+    }
+
+    printf("---------------------------------------------\n");
+    printf("Total Page Faults (LRU) = %d\n", faults);
+    free(f); free(lastUsed);
+}
+
+void runOPT(int ref[], int n, int frames) {
+    int *f = malloc(sizeof(int) * frames);
+    for (int i = 0; i < frames; ++i) f[i] = -1;
+
+    int faults = 0;
+    printf("\n--- Optimal Page Replacement ---\n");
+    printf("Ref\tFrames\t\t\tStatus\n");
+    printf("---------------------------------------------\n");
+
+    for (int i = 0; i < n; ++i) {
+        int p = ref[i];
+        printf("%2d\t", p);
+        if (!containsOPT(f, frames, p)) {
+            int victim = findVictimOPT(f, frames, ref, n, i);
+            f[victim] = p;
+            faults++;
+            printFrames(f, frames);
+            printf("\tF\n");
+        } else {
+            printFrames(f, frames);
+            printf("\t \n");
+        }
+    }
+
+    printf("---------------------------------------------\n");
+    printf("Total Page Faults (Optimal) = %d\n", faults);
+    free(f);
+}
+
+int main() {
+    int n;
+    printf("Enter number of references: ");
+    if (scanf("%d", &n) != 1) return 0;
+
+    int *ref = malloc(sizeof(int) * n);
+    printf("Enter reference string: ");
+    for (int i = 0; i < n; ++i) scanf("%d", &ref[i]);
+
+    int frames;
+    printf("Enter number of frames: ");
+    scanf("%d", &frames);
+
+    int choice;
+    printf("\nChoose Algorithm:\n");
+    printf("1. FIFO\n2. LRU\n3. Optimal\n4. All\n");
+    printf("Enter choice: ");
+    scanf("%d", &choice);
+
+    switch (choice) {
+        case 1: runFIFO(ref, n, frames); break;
+        case 2: runLRU(ref, n, frames); break;
+        case 3: runOPT(ref, n, frames); break;
+        case 4:
+            runFIFO(ref, n, frames);
+            runLRU(ref, n, frames);
+            runOPT(ref, n, frames);
+            break;
+        default:
+            printf("Invalid choice!\n");
+    }
+
+    free(ref);
+    return 0;
+}

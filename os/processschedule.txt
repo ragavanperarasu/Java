@@ -1,0 +1,268 @@
+[11/17/2025 6:10 PM] Deeresh It Frd: #include <stdio.h>
+
+int main() {
+    int n, i, j, time = 0;
+    int pid[10], at[10], bt[10], pr[10];
+    float total_tat = 0, total_wt = 0;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        printf("Enter Arrival Time of P%d: ", pid[i]);
+        scanf("%d", &at[i]);
+        printf("Enter Burst Time of P%d: ", pid[i]);
+        scanf("%d", &bt[i]);
+    }
+
+    // Sort by arrival time
+    for (i = 0; i < n - 1; i++)
+        for (j = i + 1; j < n; j++)
+            if (at[i] > at[j]) {
+                int t = at[i]; at[i] = at[j]; at[j] = t;
+                t = bt[i]; bt[i] = bt[j]; bt[j] = t;
+                t = pid[i]; pid[i] = pid[j]; pid[j] = t;
+            }
+
+    printf("\n--- FCFS ---\n");
+    printf("PID\tAT\tBT\tCT\tTAT\tWT\n");
+
+    for (i = 0; i < n; i++) {
+        if (time < at[i]) time = at[i];
+        int ct = time + bt[i];
+        int tat = ct - at[i];
+        int wt = tat - bt[i];
+        total_tat += tat; total_wt += wt;
+        printf("P%d\t%d\t%d\t%d\t%d\t%d\n", pid[i], at[i], bt[i], ct, tat, wt);
+        time = ct;
+    }
+
+    printf("\nAverage TAT = %.2f", total_tat / n);
+    printf("\nAverage WT  = %.2f\n", total_wt / n);
+}
+[11/17/2025 6:10 PM] Deeresh It Frd: #include <stdio.h>
+#include <stdbool.h>
+
+int main() {
+    int n, i, time = 0, done = 0;
+    int pid[10], at[10], bt[10];
+    bool finish[10] = {false};
+    float total_tat = 0, total_wt = 0;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        printf("Enter Arrival Time of P%d: ", pid[i]);
+        scanf("%d", &at[i]);
+        printf("Enter Burst Time of P%d: ", pid[i]);
+        scanf("%d", &bt[i]);
+    }
+
+    printf("\n--- SJF (Non-preemptive) ---\n");
+    printf("PID\tAT\tBT\tCT\tTAT\tWT\n");
+
+    while (done < n) {
+        int idx = -1, min = 9999;
+        for (i = 0; i < n; i++) {
+            if (!finish[i] && at[i] <= time && bt[i] < min) {
+                min = bt[i]; idx = i;
+            }
+        }
+        if (idx == -1) { time++; continue; }
+
+        time += bt[idx];
+        int ct = time;
+        int tat = ct - at[idx];
+        int wt = tat - bt[idx];
+        total_tat += tat; total_wt += wt;
+        printf("P%d\t%d\t%d\t%d\t%d\t%d\n", pid[idx], at[idx], bt[idx], ct, tat, wt);
+        finish[idx] = true;
+        done++;
+    }
+
+    printf("\nAverage TAT = %.2f", total_tat / n);
+    printf("\nAverage WT  = %.2f\n", total_wt / n);
+}
+[11/17/2025 6:10 PM] Deeresh It Frd: #include <stdio.h>
+
+int main() {
+    int n, i, time = 0, done = 0;
+    int pid[10], at[10], bt[10], rem[10];
+    float total_tat = 0, total_wt = 0;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        printf("Enter Arrival Time of P%d: ", pid[i]);
+        scanf("%d", &at[i]);
+        printf("Enter Burst Time of P%d: ", pid[i]);
+        scanf("%d", &bt[i]);
+        rem[i] = bt[i];
+    }
+
+    printf("\n--- SRTF (Preemptive SJF) ---\n");
+    printf("PID\tAT\tBT\tCT\tTAT\tWT\n");
+
+    while (done < n) {
+        int idx = -1, min = 9999;
+        for (i = 0; i < n; i++)
+            if (at[i] <= time && rem[i] > 0 && rem[i] < min) {
+                min = rem[i]; idx = i;
+            }
+
+        if (idx == -1) { time++; continue; }
+
+        rem[idx]--; time++;
+
+        if (rem[idx] == 0) {
+            int ct = time;
+            int tat = ct - at[idx];
+            int wt = tat - bt[idx];
+            total_tat += tat; total_wt += wt;
+            printf("P%d\t%d\t%d\t%d\t%d\t%d\n", pid[idx], at[idx], bt[idx], ct, tat, wt);
+            done++;
+        }
+    }
+
+    printf("\nAverage TAT = %.2f", total_tat / n);
+    printf("\nAverage WT  = %.2f\n", total_wt / n);
+}
+[11/17/2025 6:10 PM] Deeresh It Frd: #include <stdio.h>
+#include <stdbool.h>
+
+int main() {
+    int n, tq, i, time = 0, done = 0;
+    int pid[10], at[10], bt[10], rem[10];
+    float total_tat = 0, total_wt = 0;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        printf("Enter Arrival Time of P%d: ", pid[i]);
+        scanf("%d", &at[i]);
+        printf("Enter Burst Time of P%d: ", pid[i]);
+        scanf("%d", &bt[i]);
+        rem[i] = bt[i];
+    }
+    printf("Enter Time Quantum: ");
+    scanf("%d", &tq);
+
+    printf("\n--- Round Robin ---\n");
+    printf("PID\tAT\tBT\tCT\tTAT\tWT\n");
+
+    while (done < n) {
+        bool idle = true;
+        for (i = 0; i < n; i++) {
+            if (rem[i] > 0 && at[i] <= time) {
+                idle = false;
+                int run = (rem[i] < tq) ? rem[i] : tq;
+                rem[i] -= run;
+                time += run;
+                if (rem[i] == 0) {
+                    int ct = time;
+                    int tat = ct - at[i];
+                    int wt = tat - bt[i];
+                    total_tat += tat; total_wt += wt;
+                    printf("P%d\t%d\t%d\t%d\t%d\t%d\n", pid[i], at[i], bt[i], ct, tat, wt);
+                    done++;
+                }
+            }
+        }
+        if (idle) time++;
+    }
+
+    printf("\nAverage TAT = %.2f", total_tat / n);
+    printf("\nAverage WT  = %.2f\n", total_wt / n);
+}
+[11/17/2025 6:10 PM] Deeresh It Frd: #include <stdio.h>
+#include <stdbool.h>
+
+int main() {
+    int n, i, time = 0, done = 0;
+    int pid[10], at[10], bt[10], pr[10];
+    bool finish[10] = {false};
+    float total_tat = 0, total_wt = 0;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        printf("Enter Arrival Time of P%d: ", pid[i]);
+        scanf("%d", &at[i]);
+        printf("Enter Burst Time of P%d: ", pid[i]);
+        scanf("%d", &bt[i]);
+        printf("Enter Priority of P%d (lower=high): ", pid[i]);
+        scanf("%d", &pr[i]);
+    }
+
+    printf("\n--- Priority (Non-preemptive) ---\n");
+    printf("PID\tAT\tBT\tPR\tCT\tTAT\tWT\n");
+
+    while (done < n) {
+        int idx = -1, best = 9999;
+        for (i = 0; i < n; i++)
+            if (!finish[i] && at[i] <= time && pr[i] < best) {
+                best = pr[i]; idx = i;
+            }
+
+        if (idx == -1) { time++; continue; }
+
+        time += bt[idx];
+        int ct = time, tat = ct - at[idx], wt = tat - bt[idx];
+        total_tat += tat; total_wt += wt;
+        printf("P%d\t%d\t%d\t%d\t%d\t%d\t%d\n", pid[idx], at[idx], bt[idx], pr[idx], ct, tat, wt);
+        finish[idx] = true; done++;
+    }
+
+    printf("\nAverage TAT = %.2f", total_tat / n);
+    printf("\nAverage WT  = %.2f\n", total_wt / n);
+}
+[11/17/2025 6:10 PM] Deeresh It Frd: #include <stdio.h>
+
+int main() {
+    int n, i, time = 0, done = 0;
+    int pid[10], at[10], bt[10], pr[10], rem[10];
+    float total_tat = 0, total_wt = 0;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        printf("Enter Arrival Time of P%d: ", pid[i]);
+        scanf("%d", &at[i]);
+        printf("Enter Burst Time of P%d: ", pid[i]);
+        scanf("%d", &bt[i]);
+        printf("Enter Priority of P%d (lower=high): ", pid[i]);
+        scanf("%d", &pr[i]);
+        rem[i] = bt[i];
+    }
+
+    printf("\n--- Priority (Preemptive) ---\n");
+    printf("PID\tAT\tBT\tPR\tCT\tTAT\tWT\n");
+
+    while (done < n) {
+        int idx = -1, best = 9999;
+        for (i = 0; i < n; i++)
+            if (at[i] <= time && rem[i] > 0 && pr[i] < best) {
+                best = pr[i]; idx = i;
+            }
+
+        if (idx == -1) { time++; continue; }
+
+        rem[idx]--; time++;
+
+        if (rem[idx] == 0) {
+            int ct = time, tat = ct - at[idx], wt = tat - bt[idx];
+            total_tat += tat; total_wt += wt;
+            printf("P%d\t%d\t%d\t%d\t%d\t%d\t%d\n", pid[idx], at[idx], bt[idx], pr[idx], ct, tat, wt);
+            done++;
+        }
+    }
+
+    printf("\nAverage TAT = %.2f", total_tat / n);
+    printf("\nAverage WT  = %.2f\n", total_wt / n);
+}
