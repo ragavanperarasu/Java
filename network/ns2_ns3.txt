@@ -1,0 +1,125 @@
+# Create a Simulator
+set ns [new Simulator]
+
+# Trace and NAM files
+set tr [open simple.tr w]
+$ns trace-all $tr
+
+set nm [open simple.nam w]
+$ns namtrace-all $nm
+
+# Create 2 nodes
+set n0 [$ns node]
+set n1 [$ns node]
+
+# Create a link between them
+$ns duplex-link $n0 $n1 1Mb 10ms DropTail
+
+# Small packet sending (Ping style)
+set udp [new Agent/UDP]
+set null [new Agent/Null]
+
+$ns attach-agent $n0 $udp
+$ns attach-agent $n1 $null
+
+$ns connect $udp $null
+
+# Send a small packet
+set p [new Application/Traffic/CBR]
+$p set packetSize_ 500
+$p set rate_ 10Kb
+$p attach-agent $udp
+
+# Schedule events
+$ns at 0.5 "$p start"
+$ns at 2.0 "$p stop"
+$ns at 2.5 "finish"
+
+# Finish procedure
+proc finish {} {
+    global ns tr nm
+    $ns flush-trace
+    close $tr
+    close $nm
+    exec nam simple.nam &
+    exit 0
+}
+
+# Run simulation
+$ns run
+
+
+
+====================================================
+
+set ns [new Simulator]
+
+set tracefile [open out.tr w]
+$ns trace-all $tracefile
+set namfile [open out.nam w]
+$ns namtrace-all $namfile
+
+# Number of mesh nodes
+set N 6
+
+# Create nodes
+for {set i 0} {$i < $N} {incr i} {
+    set node($i) [$ns node]
+}
+
+# Connect each node to every other node (full mesh)
+for {set i 0} {$i < $N} {incr i} {
+    for {set j [expr $i+1]} {$j < $N} {incr j} {
+        $ns duplex-link $node($i) $node($j) 2Mb 10ms DropTail
+    }
+}
+
+# ========================
+# Traffic 1: TCP Traffic
+# ========================
+set tcp [new Agent/TCP]
+$ns attach-agent $node(0) $tcp
+
+set sink [new Agent/TCPSink]
+$ns attach-agent $node([expr $N-1]) $sink
+
+$ns connect $tcp $sink
+
+set ftp [new Application/FTP]
+$ftp attach-agent $tcp
+$ns at 1.0 "$ftp start"
+
+# ========================
+# Traffic 2: UDP/CBR Traffic
+# ========================
+set udp [new Agent/UDP]
+$ns attach-agent $node(1) $udp
+
+set null [new Agent/Null]
+$ns attach-agent $node([expr $N-2]) $null
+
+$ns connect $udp $null
+
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 512
+$cbr set interval_ 0.05
+$cbr attach-agent $udp
+
+$ns at 2.0 "$cbr start"
+
+# ========================
+# Simulation End
+# ========================
+$ns at 10.0 "finish"
+
+proc finish {} {
+    global ns tracefile namfile
+    $ns flush-trace
+    close $tracefile
+    close $namfile
+    exec nam out.nam &
+    exit 0
+}
+
+# Run simulation
+$ns run
