@@ -1,0 +1,100 @@
+What is iperf?
+
+iperf is a tool to test network speed between two machines.
+
+You need:
+
+Server machine → runs iperf in server mode
+
+Client machine → runs iperf in client mode and tests speed
+
+Both machines must be in the same network OR must reach each other.
+
+1. Start iperf Server
+
+On machine 1:
+
+iperf -s
+
+
+This starts the server on default port 5001.
+
+2. Run iperf Client (TCP test)
+
+On machine 2:
+
+iperf -c 192.168.1.10
+
+
+Here 192.168.1.10 is the server IP.
+
+This command will show:
+
+Upload speed
+
+Transfer rate
+
+3. Run TCP Test for 30 seconds
+iperf -c 192.168.1.10 -t 30
+
+4. Reverse Test (Server → Client speed)
+
+By default, test is client → server.
+To check server → client speed:
+
+iperf -c 192.168.1.10 -R
+
+5. Specify Port
+
+Start server on port 6000:
+
+iperf -s -p 6000
+
+
+Client:
+
+iperf -c 192.168.1.10 -p 6000
+
+6. UDP Test
+
+Start server:
+
+iperf -s -u
+
+
+Client:
+
+iperf -c 192.168.1.10 -u -b 10M
+
+
+This sends UDP traffic with 10 Mbps bandwidth.
+
+7. UDP Test with Packet Loss Info
+iperf -c 192.168.1.10 -u -b 20M -t 15
+
+
+Shows:
+
+Packet loss %
+
+Jitter
+
+8. Test with Multiple Parallel Streams
+iperf -c 192.168.1.10 -P 5
+
+
+Runs 5 parallel connections → useful for high-speed networks.
+
+ 9. Run Test and Save Output
+iperf -c 192.168.1.10 > result.txt
+
+10. Show Server Output in JSON
+
+Server:
+
+iperf -s --json
+
+
+Client:
+
+iperf -c 192.168.1.10 --json
