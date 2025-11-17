@@ -1,6 +1,6 @@
 Here is a very simple explanation for each command with examples. I kept the English simple and clear for you, Ragavan.
 
-✅ 1. ifconfig
+1. ifconfig
 
 Shows network interface details (old command).
 
@@ -10,7 +10,7 @@ ifconfig
 
 Output: Shows IP address, MAC address, interface status (eth0, wlan0).
 
-✅ 2. ip
+2. ip
 
 Modern command for managing network.
 
@@ -24,7 +24,7 @@ Bring interface up/down
 sudo ip link set eth0 up
 sudo ip link set eth0 down
 
-✅ 3. route
+3. route
 
 Shows routing table (old command).
 
@@ -34,28 +34,28 @@ route -n
 
 Shows default gateway, routing entries.
 
-✅ 4. ping
+4. ping
 
 Check network connection to another device.
 
 Example:
 ping google.com
 
-✅ 5. traceroute
+5. traceroute
 
 Shows the path/routers your packet travels.
 
 Example:
 traceroute google.com
 
-✅ 6. tracepath
+6. tracepath
 
 Similar to traceroute but simpler, does not need root.
 
 Example:
 tracepath google.com
 
-✅ 7. nc (netcat)
+7. nc (netcat)
 
 Powerful network tool - connect, listen, send data.
 
@@ -65,14 +65,14 @@ nc -l 8080
 Example: connect to server
 nc 127.0.0.1 8080
 
-✅ 8. nslookup
+8. nslookup
 
 Query DNS records (old tool).
 
 Example:
 nslookup google.com
 
-✅ 9. dig
+9. dig
 
 Advanced DNS lookup.
 
@@ -82,35 +82,35 @@ dig google.com
 Query only A record:
 dig google.com A
 
-✅ 10. host
+10. host
 
 Simple DNS lookup command.
 
 Example:
 host google.com
 
-✅ 11. ss
+11. ss
 
 Show open ports, sockets (new command instead of netstat).
 
 Example: list listening ports
 ss -tuln
 
-✅ 12. netstat
+12. netstat
 
 Old tool, similar to ss.
 
 Example:
 netstat -tuln
 
-✅ 13. lsof
+13. lsof
 
 Shows open files + ports (everything in Linux is a file).
 
 Example: see which process uses port 8080
 sudo lsof -i :8080
 
-✅ 14. hostname
+14. hostname
 
 Shows or sets system hostname.
 
@@ -120,28 +120,28 @@ hostname
 Change hostname:
 sudo hostnamectl set-hostname myserver
 
-✅ 15. curl
+15. curl
 
 Send HTTP requests, download webpage APIs.
 
 Example: get webpage content
 curl https://google.com
 
-✅ 16. wget
+16. wget
 
 Download files.
 
 Example:
 wget https://example.com/file.zip
 
-✅ 17. ethtool
+17. ethtool
 
 Check Ethernet interface status & speed.
 
 Example:
 sudo ethtool eth0
 
-✅ 18. ufw (Uncomplicated Firewall)
+18. ufw (Uncomplicated Firewall)
 
 Ubuntu’s firewall.
 
@@ -154,7 +154,7 @@ sudo ufw allow 80
 Check rules:
 sudo ufw status
 
-✅ 19. iptables
+19. iptables
 
 Powerful Linux firewall (low level).
 
