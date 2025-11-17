@@ -1,0 +1,161 @@
+Here are Mininet examples in both methods:
+
+1️⃣ Using Python program (custom topology)
+2️⃣ Using CLI flags (command line topology)
+
+Very simple and perfect for lab/exam.
+
+⭐ PART 1 — Mininet Python Program Examples
+
+Mininet programs are written using Python.
+Run with:
+
+sudo python3 mytopo.py
+
+✅ Example 1: Simple topology (2 hosts, 1 switch)
+
+Filename: simple.py
+
+from mininet.topo import Topo
+from mininet.net import Mininet
+from mininet.cli import CLI
+from mininet.log import setLogLevel
+
+class SimpleTopo(Topo):
+    def build(self):
+        h1 = self.addHost('h1')
+        h2 = self.addHost('h2')
+        s1 = self.addSwitch('s1')
+
+        self.addLink(h1, s1)
+        self.addLink(h2, s1)
+
+if __name__ == '__main__':
+    setLogLevel('info')
+    net = Mininet(topo=SimpleTopo())
+    net.start()
+    CLI(net)
+    net.stop()
+
+✅ Example 2: Linear Topology (h1—s1—s2—h2)
+
+linear.py
+
+from mininet.topo import Topo
+
+class LinearTopo(Topo):
+    def build(self):
+        h1 = self.addHost('h1')
+        h2 = self.addHost('h2')
+
+        s1 = self.addSwitch('s1')
+        s2 = self.addSwitch('s2')
+
+        self.addLink(h1, s1)
+        self.addLink(s1, s2)
+        self.addLink(s2, h2)
+
+
+Run:
+
+sudo mn --custom linear.py --topo lineartopo
+
+✅ Example 3: Ring Topology
+
+ring.py
+
+from mininet.topo import Topo
+
+class RingTopo(Topo):
+    def build(self):
+        s1 = self.addSwitch('s1')
+        s2 = self.addSwitch('s2')
+        s3 = self.addSwitch('s3')
+
+        self.addLink(s1, s2)
+        self.addLink(s2, s3)
+        self.addLink(s3, s1)
+
+✅ Example 4: Tree Topology (Depth=2, Fanout=2)
+
+tree.py
+
+from mininet.topo import Topo
+
+class MyTree(Topo):
+    def build(self):
+        self.addTree(depth=2, fanout=2)
+
+
+Run:
+
+sudo mn --custom tree.py --topo mytree
+
+⭐ PART 2 — Mininet Flags (Command Line Examples)
+
+These are direct CLI commands (no programming).
+Very important for practical exams.
+
+✅ 1. Default minimal topology
+sudo mn
+
+
+Creates 2 hosts, 1 switch.
+
+✅ 2. Linear topology using flag
+
+Create 3 switches in line:
+
+sudo mn --topo linear,3
+
+
+Hosts = 3, Switches = 3 in a line.
+
+✅ 3. Tree topology
+
+Depth=2, Fanout=3:
+
+sudo mn --topo tree,depth=2,fanout=3
+
+✅ 4. Single switch with 5 hosts
+sudo mn --topo single,5
+
+✅ 5. Custom link parameters
+
+Slow speed link:
+
+sudo mn --link tc,bw=5
+
+
+Add delay + bandwidth:
+
+sudo mn --link tc,bw=10,delay=20ms
+
+✅ 6. Choose controller
+
+Remote controller:
+
+sudo mn --controller=remote,ip=127.0.0.1,port=6633
+
+
+OVS controller:
+
+sudo mn --controller=ovsc
+
+✅ 7. Choose switch type
+
+OVS user-space switch:
+
+sudo mn --switch ovsk
+
+✅ 8. Combine topology + link + controller
+sudo mn --topo linear,4 --link tc,bw=10,delay=5ms --controller=ovsc
+
+✅ 9. Ping all hosts
+
+(inside Mininet CLI)
+
+mininet> pingall
+
+✅ 10. Start iperf test
+mininet> iperf h1 h2
