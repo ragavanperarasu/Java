@@ -1,0 +1,107 @@
+✅ 1. Filter by IP Address
+Source IP
+ip.src == 192.168.1.10
+
+Destination IP
+ip.dst == 192.168.1.20
+
+Any match
+ip.addr == 192.168.1.10
+
+✅ 2. Filter by Protocol
+Show only TCP packets
+tcp
+
+Show only UDP packets
+udp
+
+Show only HTTP
+http
+
+Show only DNS
+dns
+
+✅ 3. Filter by Port
+TCP port
+tcp.port == 80
+
+Source port
+tcp.srcport == 443
+
+Destination port
+tcp.dstport == 22
+
+UDP port
+udp.port == 53
+
+✅ 4. Filter by MAC Address
+eth.addr == AA:BB:CC:DD:EE:FF
+
+Source MAC
+eth.src == AA:BB:CC:DD:EE:FF
+
+Destination MAC
+eth.dst == AA:BB:CC:DD:EE:FF
+
+✅ 5. Show only Packets Containing a String
+
+Example: packets containing the word "login"
+
+frame contains "login"
+
+✅ 6. Filter by Network Range
+
+Example: show all IPs in 192.168.1.0/24
+
+ip.addr == 192.168.1.0/24
+
+✅ 7. Filter by TCP Flags
+SYN packets
+tcp.flags.syn == 1
+
+ACK packets
+tcp.flags.ack == 1
+
+SYN + ACK
+tcp.flags.syn == 1 and tcp.flags.ack == 1
+
+RST packets
+tcp.flags.reset == 1
+
+✅ 8. Filter by HTTP Method
+GET requests
+http.request.method == "GET"
+
+POST requests
+http.request.method == "POST"
+
+✅ 9. Filter by ARP
+All ARP packets
+arp
+
+ARP requests
+arp.opcode == 1
+
+ARP replies
+arp.opcode == 2
+
+✅ 10. Filter by ICMP (Ping)
+icmp
+
+Only echo request:
+icmp.type == 8
+
+Only echo reply:
+icmp.type == 0
+
+✅ 11. Follow a Specific TCP Connection
+tcp.stream eq 5
+
+
+(Find stream number from any packet → right-click → Follow → TCP Stream)
+
+✅ 12. Filter by Packet Length
+
+Example: packets larger than 1000 bytes
+
+frame.len > 1000
