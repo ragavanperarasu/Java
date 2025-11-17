@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void sort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+}
+
+void SSTF(int req[], int n, int head) {
+    int visited[100] = {0};
+    int total = 0, count = 0, pos = head;
+
+    printf("\nSSTF Disk Scheduling:\nOrder: %d ", head);
+
+    while (count < n) {
+        int min = 9999, index = -1;
+
+        for (int i = 0; i < n; i++) {
+            if (!visited[i] && abs(req[i] - pos) < min) {
+                min = abs(req[i] - pos);
+                index = i;
+            }
+        }
+
+        visited[index] = 1;
+        total += abs(req[index] - pos);
+        pos = req[index];
+        printf("-> %d ", pos);
+        count++;
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+void SCAN(int req[], int n, int head, int disk) {
+    int total = 0, pos = head;
+    int left[100], right[100];
+    int l = 0, r = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (req[i] < head) left[l++] = req[i];
+        else right[r++] = req[i];
+    }
+
+    sort(left, l);
+    sort(right, r);
+
+    printf("\nSCAN Disk Scheduling (moving right first):\nOrder: %d ", head);
+
+    for (int i = 0; i < r; i++) {
+        total += abs(right[i] - pos);
+        pos = right[i];
+        printf("-> %d ", pos);
+    }
+
+    total += abs(disk - pos);
+    pos = disk;
+    printf("-> %d ", pos);
+
+    for (int i = l - 1; i >= 0; i--) {
+        total += abs(left[i] - pos);
+        pos = left[i];
+        printf("-> %d ", pos);
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+void CLOOK(int req[], int n, int head) {
+    int total = 0, pos = head;
+    int left[100], right[100];
+    int l = 0, r = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (req[i] < head) left[l++] = req[i];
+        else right[r++] = req[i];
+    }
+
+    sort(left, l);
+    sort(right, r);
+
+    printf("\nC-LOOK Disk Scheduling:\nOrder: %d ", head);
+
+    for (int i = 0; i < r; i++) {
+        total += abs(right[i] - pos);
+        pos = right[i];
+        printf("-> %d ", pos);
+    }
+
+    if (l > 0) {
+        total += abs(pos - left[0]); // wrap-around jump
+        pos = left[0];
+        printf("-> %d ", pos);
+
+        for (int i = 1; i < l; i++) {
+            total += abs(left[i] - pos);
+            pos = left[i];
+            printf("-> %d ", pos);
+        }
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+int main() {
+    int n, head, disk;
+    int req[100];
+
+    printf("Enter number of requests: ");
+    scanf("%d", &n);
+
+    printf("Enter request queue: ");
+    for (int i = 0; i < n; i++) scanf("%d", &req[i]);
+
+    printf("Enter initial head position: ");
+    scanf("%d", &head);
+
+    printf("Enter disk size (last track number): ");
+    scanf("%d", &disk);
+
+    SSTF(req, n, head);
+    SCAN(req, n, head, disk);
+    CLOOK(req, n, head);
+
+    return 0;
+}
