@@ -1,0 +1,98 @@
+ffmpeg -stream_loop -1 -re -i sample.mp4 -c copy -f mpegts udp://127.0.0.1:1234
+
+=========================
+
+Here are the best and simplest FFmpeg commands to stream video over LAN, RTP, RTMP, UDP, and HTTP**.
+Very useful for projects + exams.
+
+✅ 1. Stream Video Over UDP (LAN Streaming)
+
+This is the simplest and most common method.
+
+Sender (PC 1 → streaming)
+ffmpeg -re -i sample.mp4 -c copy -f mpegts udp://192.168.1.10:1234
+
+
+Meaning:
+
+-re → real-time
+
+-i sample.mp4 → input video
+
+-c copy → no re-encoding
+
+mpegts → transport stream format
+
+Send to IP:PORT
+
+Receiver (PC 2 → playing)
+vlc udp://@:1234
+
+
+or
+
+ffplay udp://@:1234
+
+✅ 2. Stream Using RTP (low latency)
+Sender
+ffmpeg -re -i sample.mp4 -c copy -f rtp rtp://192.168.1.10:5004
+
+Receiver
+ffplay rtp://192.168.1.10:5004
+
+✅ 3. Stream Over RTMP (like YouTube Live server)
+Start local RTMP server using Nginx
+
+In nginx.conf:
+
+rtmp {
+    server {
+        listen 1935;
+        application live {
+            live on;
+        }
+    }
+}
+
+Sender
+ffmpeg -re -i sample.mp4 -c copy -f flv rtmp://localhost/live/stream1
+
+Receiver
+vlc rtmp://localhost/live/stream1
+
+✅ 4. Stream Over HTTP (HLS streaming)
+
+Creates .m3u8 + .ts segments.
+
+Create HLS files
+ffmpeg -i sample.mp4 -profile:v baseline -level 3.0 \
+-hls_time 4 -hls_list_size 0 -f hls stream.m3u8
+
+
+Host them using:
+
+python3 -m http.server 8080
+
+Play
+vlc http://localhost:8080/stream.m3u8
+
+✅ 5. Stream WebCam Live Over Network
+Sender
+ffmpeg -f v4l2 -i /dev/video0 -f mpegts udp://192.168.1.10:1234
+
+Receiver
+ffplay udp://@:1234
+
+✅ 6. Stream Desktop Screen Live
+Sender (Linux screen capture)
+ffmpeg -f x11grab -i :0.0 -f mpegts udp://192.168.1.10:1234
+
+Receiver
+ffplay udp://@:1234
+
+✅ 7. Stream With Re-encoding (better compatibility)
+ffmpeg -re -i sample.mp4 -vcodec libx264 -acodec aac -preset fast \
+-f mpegts udp://192.168.1.10:1234
+
+⭐ Bonus: Loop the video for continuous streaming
+ffmpeg -stream_loop -1 -re -i sample.mp4 -c copy -f mpegts udp://192.168.1.10:1234
