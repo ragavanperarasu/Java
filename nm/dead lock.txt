@@ -1,0 +1,117 @@
+1) DEADLOCK RESOURCE METHOD
+import java.util.*;
+
+class DeadlockPrevention {
+
+    // Fixed order of resources
+    static final List<String> resourceOrder = Arrays.asList("R1", "R2", "R3");
+
+    static boolean requestResources(String process, List<String> requested) {
+        // Sort based on global order
+        requested.sort(Comparator.comparingInt(resourceOrder::indexOf));
+
+        System.out.println(process + " requests " + requested + " following global order: " + resourceOrder);
+        System.out.println("Request granted (no circular wait possible).\n");
+
+        return true;
+    }
+
+    public static void main(String[] args) {
+        List<String> reqP1 = Arrays.asList("R3", "R1");
+        List<String> reqP2 = Arrays.asList("R2");
+
+        requestResources("P1", reqP1);
+        requestResources("P2", reqP2);
+    }
+}
+
+2)DEADLOCK AVOIDANCE(Bankers algorithm)
+import java.util.*;
+
+public class BankersAlgorithm {
+
+    static int processes, resources;
+    static int[][] max;
+    static int[][] alloc;
+    static int[][] need;
+    static int[] avail;
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        processes = sc.nextInt();
+
+        System.out.print("Enter number of resources: ");
+        resources = sc.nextInt();
+
+        max = new int[processes][resources];
+        alloc = new int[processes][resources];
+        need = new int[processes][resources];
+        avail = new int[resources];
+
+        System.out.println("\nEnter MAX matrix:");
+        for (int i = 0; i < processes; i++)
+            for (int j = 0; j < resources; j++)
+                max[i][j] = sc.nextInt();
+
+        System.out.println("\nEnter ALLOCATION matrix:");
+        for (int i = 0; i < processes; i++)
+            for (int j = 0; j < resources; j++)
+                alloc[i][j] = sc.nextInt();
+
+        System.out.println("\nEnter AVAILABLE resources:");
+        for (int j = 0; j < resources; j++)
+            avail[j] = sc.nextInt();
+
+        // Calculate need matrix
+        for (int i = 0; i < processes; i++)
+            for (int j = 0; j < resources; j++)
+                need[i][j] = max[i][j] - alloc[i][j];
+
+        System.out.println("\nChecking system safety...");
+        checkSafeState();
+    }
+
+    static void checkSafeState() {
+        boolean[] finished = new boolean[processes];
+        int[] safeSeq = new int[processes];
+        int[] work = Arrays.copyOf(avail, resources);
+
+        int count = 0;
+
+        while (count < processes) {
+            boolean found = false;
+
+            for (int i = 0; i < processes; i++) {
+                if (!finished[i]) {
+                    int j;
+                    for (j = 0; j < resources; j++)
+                        if (need[i][j] > work[j])
+                            break;
+
+                    if (j == resources) {
+                        for (int k = 0; k < resources; k++)
+                            work[k] += alloc[i][k];
+
+                        safeSeq[count++] = i;
+                        finished[i] = true;
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found) {
+                System.out.println("\nSystem is in UNSAFE state (deadlock possible)");
+                return;
+            }
+        }
+
+        System.out.println("\nSystem is in SAFE state.");
+        System.out.print("Safe Sequence: ");
+        for (int i = 0; i < processes; i++)
+            System.out.print("P" + safeSeq[i] + " ");
+        System.out.println();
+    }
+}

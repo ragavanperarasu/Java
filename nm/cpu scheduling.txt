@@ -1,0 +1,378 @@
+1)FIRST COME FIRST SERVE
+
+import java.util.*;
+
+class FCFS {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        int[] burst = new int[n];
+        int[] waiting = new int[n];
+        int[] turnaround = new int[n];
+
+        // Input burst times
+        System.out.println("\nEnter Burst Time for each process:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("P" + (i + 1) + ": ");
+            burst[i] = sc.nextInt();
+        }
+
+        // FCFS Scheduling: Calculate waiting time
+        waiting[0] = 0; // first process has zero waiting time
+        for (int i = 1; i < n; i++) {
+            waiting[i] = waiting[i - 1] + burst[i - 1];
+        }
+
+        // Turnaround time = waiting time + burst time
+        for (int i = 0; i < n; i++) {
+            turnaround[i] = waiting[i] + burst[i];
+        }
+
+        // Display results
+        System.out.println("\nProcess\tBurst\tWaiting\tTurnaround");
+        for (int i = 0; i < n; i++) {
+            System.out.println("P" + (i + 1) + "\t" + burst[i] + "\t" + waiting[i] + "\t" + turnaround[i]);
+        }
+
+        // Calculate averages
+        float avgWait = 0, avgTurn = 0;
+        for (int i = 0; i < n; i++) {
+            avgWait += waiting[i];
+            avgTurn += turnaround[i];
+        }
+
+        System.out.println("\nAverage Waiting Time: " + (avgWait / n));
+        System.out.println("Average Turnaround Time: " + (avgTurn / n));
+
+        sc.close();
+    }
+}
+
+2)SHORTEST JOB FIRST
+
+import java.util.*;
+
+class SJF {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        int[] burst = new int[n];
+        int[] waiting = new int[n];
+        int[] turnaround = new int[n];
+        int[] process = new int[n];
+
+        // Process IDs
+        for (int i = 0; i < n; i++) {
+            process[i] = i + 1;
+        }
+
+        // Input burst times
+        System.out.println("\nEnter Burst Time for each process:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("P" + (i + 1) + ": ");
+            burst[i] = sc.nextInt();
+        }
+
+        // Sort processes by burst time (SJF)
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (burst[j] < burst[i]) {
+                    // swap burst times
+                    int temp = burst[i];
+                    burst[i] = burst[j];
+                    burst[j] = temp;
+
+                    // swap process IDs
+                    int temp2 = process[i];
+                    process[i] = process[j];
+                    process[j] = temp2;
+                }
+            }
+        }
+
+        // Calculate waiting time
+        waiting[0] = 0; 
+        for (int i = 1; i < n; i++) {
+            waiting[i] = waiting[i - 1] + burst[i - 1];
+        }
+
+        // Calculate turnaround time
+        for (int i = 0; i < n; i++) {
+            turnaround[i] = waiting[i] + burst[i];
+        }
+
+        // Display results
+        System.out.println("\nProcess\tBurst\tWaiting\tTurnaround");
+        for (int i = 0; i < n; i++) {
+            System.out.println("P" + process[i] + "\t" + burst[i] + "\t" + waiting[i] + "\t" + turnaround[i]);
+        }
+
+        // Calculate averages
+        float avgWait = 0, avgTurn = 0;
+        for (int i = 0; i < n; i++) {
+            avgWait += waiting[i];
+            avgTurn += turnaround[i];
+        }
+
+        System.out.println("\nAverage Waiting Time: " + (avgWait / n));
+        System.out.println("Average Turnaround Time: " + (avgTurn / n));
+        
+        sc.close();
+    }
+}
+
+3)ROUND ROBIN
+import java.util.*;
+
+class RoundRobin {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        int[] burst = new int[n];
+        int[] remaining = new int[n];
+        int[] waiting = new int[n];
+        int[] turnaround = new int[n];
+
+        // Input burst times
+        System.out.println("\nEnter Burst Time for each process:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("P" + (i + 1) + ": ");
+            burst[i] = sc.nextInt();
+            remaining[i] = burst[i]; // copy burst time into remaining
+        }
+
+        System.out.print("\nEnter Time Quantum: ");
+        int quantum = sc.nextInt();
+
+        int time = 0;   // current time
+
+        // Round Robin Scheduling
+        boolean processesLeft;
+
+        do {
+            processesLeft = false;
+
+            for (int i = 0; i < n; i++) {
+                if (remaining[i] > 0) {
+                    processesLeft = true;
+
+                    if (remaining[i] > quantum) {
+                        time += quantum;
+                        remaining[i] -= quantum;
+                    } else {
+                        time += remaining[i];
+                        waiting[i] = time - burst[i];
+                        remaining[i] = 0;
+                    }
+                }
+            }
+        } while (processesLeft);
+
+        // Turnaround time
+        for (int i = 0; i < n; i++) {
+            turnaround[i] = burst[i] + waiting[i];
+        }
+
+        // Display results
+        System.out.println("\nProcess\tBurst\tWaiting\tTurnaround");
+        for (int i = 0; i < n; i++) {
+            System.out.println("P" + (i + 1) + "\t" 
+                    + burst[i] + "\t" 
+                    + waiting[i] + "\t" 
+                    + turnaround[i]);
+        }
+
+        // Averages
+        float avgWait = 0, avgTurn = 0;
+        for (int i = 0; i < n; i++) {
+            avgWait += waiting[i];
+            avgTurn += turnaround[i];
+        }
+
+        System.out.println("\nAverage Waiting Time: " + (avgWait / n));
+        System.out.println("Average Turnaround Time: " + (avgTurn / n));
+
+        sc.close();
+    }
+}
+
+4) SHORTEST REMAINING TIME FIRST
+import java.util.*;
+
+class SRTF {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        int[] pid = new int[n];
+        int[] arrival = new int[n];
+        int[] burst = new int[n];
+        int[] remaining = new int[n];
+        int[] completion = new int[n];
+        int[] waiting = new int[n];
+        int[] turnaround = new int[n];
+
+        // Input details
+        for (int i = 0; i < n; i++) {
+            pid[i] = i + 1;
+
+            System.out.print("Enter arrival time for P" + pid[i] + ": ");
+            arrival[i] = sc.nextInt();
+
+            System.out.print("Enter burst time for P" + pid[i] + ": ");
+            burst[i] = sc.nextInt();
+
+            remaining[i] = burst[i];
+        }
+
+        int complete = 0, time = 0, min = Integer.MAX_VALUE;
+        int shortest = -1;
+        boolean found = false;
+
+        // SRTF Simulation
+        while (complete != n) {
+
+            // Find process with minimum remaining time among those that arrived
+            for (int i = 0; i < n; i++) {
+                if (arrival[i] <= time && remaining[i] > 0 && remaining[i] < min) {
+                    min = remaining[i];
+                    shortest = i;
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                time++;
+                continue;
+            }
+
+            // Reduce remaining time of the selected process
+            remaining[shortest]--;
+            min = remaining[shortest];
+
+            // If process finishes
+            if (remaining[shortest] == 0) {
+                complete++;
+                found = false;
+                min = Integer.MAX_VALUE;
+
+                completion[shortest] = time + 1;
+            }
+
+            time++;
+        }
+
+        // Calculating Waiting & Turnaround time
+        for (int i = 0; i < n; i++) {
+            turnaround[i] = completion[i] - arrival[i];
+            waiting[i] = turnaround[i] - burst[i];
+        }
+
+        // Display output
+        System.out.println("\nProcess\tAT\tBT\tWT\tTAT");
+        for (int i = 0; i < n; i++) {
+            System.out.println("P" + pid[i] + "\t" + arrival[i] + "\t" + burst[i] +
+                    "\t" + waiting[i] + "\t" + turnaround[i]);
+        }
+
+        // Averages
+        double avgWT = 0, avgTAT = 0;
+        for (int i = 0; i < n; i++) {
+            avgWT += waiting[i];
+            avgTAT += turnaround[i];
+        }
+
+        System.out.println("\nAverage Waiting Time: " + (avgWT / n));
+        System.out.println("Average Turnaround Time: " + (avgTAT / n));
+
+        sc.close();
+    }
+}
+
+5) PRIORITY SHEDULING
+import java.util.*;
+
+class Process {
+    int pid;        // Process ID
+    int burst;      // Burst Time
+    int priority;   // Priority
+    int waiting;    // Waiting Time
+    int turnaround; // Turnaround Time
+
+    public Process(int pid, int burst, int priority) {
+        this.pid = pid;
+        this.burst = burst;
+        this.priority = priority;
+    }
+}
+
+public class PriorityScheduling {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        List<Process> processes = new ArrayList<>();
+
+        // Input: burst time & priority
+        for (int i = 0; i < n; i++) {
+            System.out.println("Process " + (i + 1));
+            System.out.print("Burst Time: ");
+            int burst = sc.nextInt();
+            System.out.print("Priority: ");
+            int priority = sc.nextInt();
+            processes.add(new Process(i + 1, burst, priority));
+        }
+
+        // Sort by priority (lower number = higher priority)
+        processes.sort(Comparator.comparingInt(p -> p.priority));
+
+        // Calculate waiting & turnaround time
+        int time = 0;
+        for (Process p : processes) {
+            p.waiting = time;
+            p.turnaround = p.waiting + p.burst;
+            time += p.burst;
+        }
+
+        // Output result
+        System.out.println("\nPriority Scheduling Result:");
+        System.out.println("PID\tBurst\tPriority\tWaiting\tTurnaround");
+
+        int totalWait = 0, totalTat = 0;
+        for (Process p : processes) {
+            System.out.println(p.pid + "\t" + p.burst + "\t" + p.priority + "\t\t" + p.waiting
+                    + "\t" + p.turnaround);
+            totalWait += p.waiting;
+            totalTat += p.turnaround;
+        }
+
+        System.out.println("\nAverage Waiting Time: " + (totalWait / (float) n));
+        System.out.println("Average Turnaround Time: " + (totalTat / (float) n));
+
+        sc.close();
+    }
+}
+
+
+
+
+
+        
+
+           
+                
